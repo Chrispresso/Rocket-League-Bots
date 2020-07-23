@@ -15,13 +15,14 @@ class HelloWorldCallback(GenericCallback):
         self.agent = agent
         self.updates = 0
 
-    def begin(self, packet: GameTickPacket) -> None:
+    def begin(self) -> None:
         self.begin_time = time.time()
 
     def update(self, packet: GameTickPacket) -> None:
+        print(packet.game_info.seconds_elapsed)
         self.updates += 1
 
-    def end(self, packet: GameTickPacket) -> None:
+    def end(self) -> None:
         self.end_time = time.time()
         print(f'ran for {self.end_time - self.begin_time}s')
 
@@ -40,23 +41,18 @@ class MyBot(BaseAgent):
 
     def __init__(self, name, team, index):
         super().__init__(name, team, index)
-        with keyboard.GlobalHotKeys({
-            '<ctrl>+h': on_activate_h,
-            '<ctrl>+i': on_activate_i}) as h:
-            h.join()
-
-
-
+ 
         self.potato_recorder = SimpleRecorder('Potato')
         self.hello_world_callback = HelloWorldCallback('HelloWorld', self)
         # Register the sequence BTN_START + A + B to HelloWorldCallback
         self.potato_recorder.register(
-            ['A', 'B'],
+            '<ctrl>+h',
             self.hello_world_callback
         )
         
     def initialize_agent(self):
-        pass
+        self.potato_recorder.start()
+        print('here?')
 
     def get_output(self, packet: GameTickPacket) -> SimpleControllerState:
         """
