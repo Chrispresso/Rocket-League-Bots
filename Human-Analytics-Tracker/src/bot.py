@@ -42,7 +42,7 @@ class MyBot(BaseAgent):
     def __init__(self, name, team, index):
         super().__init__(name, team, index)
  
-        self.potato_recorder = SimpleRecorder('Potato')
+        self.potato_recorder = SimpleRecorder()
         self.hello_world_callback = HelloWorldCallback('HelloWorld', self)
         # Register the sequence BTN_START + A + B to HelloWorldCallback
         self.potato_recorder.register(

@@ -51,12 +51,12 @@ class SimpleRecorder:
     SimpleRecorder is designed to record human stats using the XBox360 controller.
     This recording can have multiple key configurations and multiple macros (GenericCallbacks).
     """
-    def __init__(self, name: str):
-        self.name = name
-        self.record_hold = False
+    def __init__(self):
         self.mapping: Dict[str, GenericCallback] = {}
         self.update_func = {}  # @TODO: Make this part better. No need to have another mapping here
         self.states: Dict[str, GenericCallbackState] = {}
+        self.started = False
+        self.ghk = None
 
     def register(self, sequence: str, callback: GenericCallback) -> bool:
         """
@@ -109,8 +109,13 @@ class SimpleRecorder:
         """
         Sets up the listeners
         """
-        ghk = keyboard.GlobalHotKeys(self.mapping)
-        ghk.start()
+        # If you try calling start() multiple times, you will have two listener threads.
+        # Because  that is not desired, check to see if this thread has started already and restart if needed.
+        if self.started:
+            self.ghk.stop()
+        self.ghk = keyboard.GlobalHotKeys(self.mapping)
+        self.ghk.start()
+        self.started = True
 
 
     def update(self, packet: GameTickPacket) -> None:
